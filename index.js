@@ -1,5 +1,6 @@
 
-function safeEval(data, fn) {
+function __safeEval__(data, fn) {
+    var value;
     try {
 	value	= fn.call(data);
     }
@@ -8,42 +9,66 @@ function safeEval(data, fn) {
     }
     return value;
 }
-function startsWith(s, n) {
+function __startsWith__(s, n) {
     return s.indexOf(n) === 0;
 }
-function format(s, data) {
-    var value;
-    var str		= s.slice();
-    var re		= /{([^}]+)}/gi;
-    var match		= re.exec(s);
-    while (match !== null) {
-	value		= safeEval(data, function() {
-	    var value	= eval("this."+match[1].trim());
-	    return value === undefined
-		? '' : value;
+function __format__(s, data) {
+    var __value__;
+    var __str__		= s.slice();
+    var __re__		= /{([^}]+)}/gi;
+    var __match__	= __re__.exec(s);
+    while (__match__ !== null) {
+	__value__	= __safeEval__(data, function() {
+	    var v = eval("this."+__match__[1].trim());
+	    return v === undefined
+		? '' : v;
 	});
-	str		= str.replace(match[0], value);
-	var match	= re.exec(s);
+	__str__		= __str__.replace(__match__[0], __value__);
+	var __match__	= __re__.exec(s);
     }
-    return str;
+    return __str__;
 }
 
-function fill(s, data) {
-    if (startsWith(s, '<'))
-	return safeEval(data, function() {
-	    return eval("this."+s.slice(1));
+function __fill__(__str__, data) {
+    __fill__.last	= __str__;
+    __fill__.data	= data;
+    var v;
+    if (__startsWith__(__str__, '<'))
+	v	= __safeEval__(data, function() {
+	    return eval("this."+__str__.slice(1));
 	});
-
-    if (startsWith(s, ':'))
-	return format(s.slice(1), data);
+    else if (__startsWith__(__str__, ':'))
+	v	= __format__(__str__.slice(1), data);
     else {
-	var v		= format(s, data);
-	if (startsWith(s, '='))
-	    v		= safeEval(data, function() {
+	v	= __format__(__str__, data);
+	if (__startsWith__(__str__, '=')) {
+	    v	= __safeEval__(data, function() {
 		return eval(v.slice(1));
 	    });
-	return v;
+	}
+    }
+    __fill__.value	= v;
+    return v;
+}
+__fill__.format		= __format__;
+__fill__.reserved	= [
+    "__fill__", "__format__", "__safeEval__", "__startsWith__",
+    "__str__", "__re__", "__match__", "data", "this", "eval"
+];
+__fill__.method		= function(name, fn) {
+    if (__fill__.reserved.indexOf(name) !== -1)
+	throw new Error(name+" is a reserved function name");
+    try {
+	eval(
+	    [
+		"root[name]	= function "+name+"() {",
+		"    return fn.apply(__fill__.data, arguments);",
+		"}"
+	    ].join("\n")
+	);
+    } catch (err) {
+	console.log(err);
+	return err;
     }
 }
-fill.format	= format;
-module.exports	= fill;
+module.exports	= __fill__;

@@ -1,13 +1,5 @@
 
-var f	= require('./index.js');
-
-function fill(s,d) {
-    var v	= f(s,d);
-    fill.last	= s;
-    fill.data	= d;
-    fill.value	= v;
-    return v;
-}
+var fill	= require('./index.js');
 
 function assert(e) {
     assert.count	= assert.count ? assert.count++ : 1;
@@ -62,3 +54,21 @@ assert(str === ": Travis Mottershead");
 
 var str	= fill("= this.name.full", Person);
 assert(str === "Travis Mottershead");
+
+fill.method('poop', function(str) {
+    return str+" and "+this.name.full;
+});
+
+var str	= fill("= poop('Geoff Dick')", Person);
+assert(str === "Geoff Dick and Travis Mottershead");
+
+try {
+    fill.method('eval', function() {
+	return true;
+    });
+} catch (err) {
+    if(err.message !== "eval is a reserved function name")
+	console.log("Failed: to catch error for reserved method name");
+    else
+	console.log("Passed: caught error for create reserved method name");
+}
