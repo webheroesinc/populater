@@ -1,0 +1,10 @@
+{
+    "name": "pitch/populater",
+    "authors": [
+        {
+            "name": "Matthew Brisebois",
+            "email": "matthew@webheroes.ca"
+        }
+    ],
+    "require": {}
+}
