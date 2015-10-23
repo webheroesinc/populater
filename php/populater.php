@@ -18,10 +18,8 @@ function __startsWith__($s, $n) {
     return $n === "" || strrpos($s, $n, -strlen($s)) !== FALSE;
 }
 function __eval__($__str__, $data) {
-    $__lvl__		= error_reporting(0);
     $__value__		= "";
     eval("\$__value__	= ".$__str__.";");
-    error_reporting($__lvl__);
     return $__value__;
 }
 function __convert__($str) {
