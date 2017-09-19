@@ -4,40 +4,34 @@ function startsWith(s, n) {
     return s.indexOf(n) === 0;
 }
 
-function populater(code, ctx, fn_ctx) {
+
+function Template(str) {
+    if (!(this instanceof Template))
+	return new Template(str);
     
-    if (typeof code !== 'string')
+    if (typeof str !== 'string') {
 	throw new Error(
-	    populater(
-		"Populater can only handle string formatting not type '{{type}}' {{ctx}}",
-		{ type:typeof code, ctx:JSON.stringify(code, null, 4) }
+	    Populater({ type:typeof str, ctx:JSON.stringify(str, null, 4) })(
+		"Template only takes 1 string, not type '{{type}}' {{ctx}}"
 	    )
 	);
-
-    var v;
-    if (startsWith(code, '<'))
-	v		= isolate.eval("this."+code.slice(1), ctx, fn_ctx);
-    else if (startsWith(code, ':'))
-	v		= populater.fill(code.slice(1), ctx, fn_ctx);
-    else {
-	v		= populater.fill(code, ctx, fn_ctx);
-	if (startsWith(code, '=')) {
-	    v		= isolate.eval(v.slice(1), ctx, fn_ctx);
-	}
     }
 
-    populater.before	= code; // temporary: need by tests for logging
-    populater.after	= v; // temporary: need by tests for logging
-    return v;
-}
-populater.fill		= function(s, ctx, fn_ctx) {
+    this.str		= str;
+    Populater.before	= str;
+}    
+Template.prototype.fill	= function(s) {
     var v;
     var str		= s.slice();
     
     var regex		= /{{([^}]+)}}/gi;
     var match		= regex.exec(s);
     while (match !== null) {
-	v		= isolate.eval("this."+match[1].trim(), ctx, fn_ctx);
+	if (match[1].indexOf('.') !== -1 || match[1].indexOf('[') !== -1)
+	    v		= isolate.eval("this."+match[1].trim(), this.ctx, this.fn_ctx);
+	else
+	    // Accommodate indexing with numbers
+	    v		= isolate.eval("this['"+match[1].trim()+"']", this.ctx, this.fn_ctx);
 	if (v === undefined)
 	    v		= '';
 	str		= str.replace(match[0], v);
@@ -46,11 +40,54 @@ populater.fill		= function(s, ctx, fn_ctx) {
     
     return str;
 };
-populater.error		= function(fn) {
+Template.prototype.eval	= function(str) {
+    return isolate.eval(str, this.ctx, this.fn_ctx);
+};
+Template.prototype.context	= function(ctx, fn_ctx) {
+    this.ctx		= ctx;
+    this.fn_ctx		= fn_ctx;
+    
+    var v;
+    if (startsWith(this.str, '<'))
+	v		= this.eval("this."+this.str.slice(1));
+    else {
+	v		= this.fill(this.str);
+	if (startsWith(this.str, ':'))
+	    v		= v.slice(1);
+	else if (startsWith(this.str, '='))
+	    v		= this.eval(v.slice(1));
+    }
+
+    Populater.after	= v; // temporary: need by tests for logging
+    return v;
+    
+};
+
+
+function Populater(data, ctx) {
+    
+    if (typeof data !== 'object') {
+	throw new Error(
+	    Populater({ type: typeof data })(
+		"Populater can only take complex objects, not type '{{type}}'.  See Populater.template() for other uses."
+	    )
+	);
+    }
+
+    return function(str) {
+	return Template(str).context(data, ctx);
+    }
+}
+
+
+Populater.template		= function(str) {
+    return Template(str);
+}
+Populater.error		= function(fn) {
     return isolate.error(fn);
 }
-populater.method	= function(name, fn, err) {
+Populater.method	= function(name, fn, err) {
     return isolate.method(name, fn, err);
 }
 
-module.exports		= populater;
+module.exports		= Populater;
