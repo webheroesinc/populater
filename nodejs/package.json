@@ -1,11 +1,20 @@
 {
   "name": "populater",
-  "version": "0.5.0",
-  "description": "",
+  "version": "0.5.1",
+  "description": "Cross platform string syntax for reliably extracting object data",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodejs test.js"
   },
-  "author": "Matthew Brisebois",
-  "license": "GPLv3"
+  "author": {
+    "name": "Matthew Brisebois"
+  },
+  "license": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:webheroesinc/populater.git"
+  },
+  "bugs": {
+    "url": "https://github.com/webheroesinc/populater/issues"
+  }
 }

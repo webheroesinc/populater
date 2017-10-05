@@ -5,8 +5,10 @@ var isolate		= require('./isolate.js');
 function assert(e) {
     assert.count	= assert.count ? assert.count++ : 1;
     var conversion	= "'"+populater.before+"'"+"	>>	'"+populater.after+"'";
-    if (e!==true)
+    if (e!==true) {
 	console.log("Failed Test "+assert.count+": "+conversion);
+	throw Error("Failed Test "+assert.count+": "+conversion);
+    }
     else
 	console.log("Passed: "+conversion);
 }
