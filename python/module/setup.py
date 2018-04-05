@@ -9,7 +9,7 @@ setup(
         "populater":		".",
     },
     install_requires            = [],
-    version                     = "0.1.1",
+    version                     = "0.1.2",
     include_package_data        = True,
     author                      = "Matthew Brisebois",
     author_email                = "matthew@webheroes.ca",
