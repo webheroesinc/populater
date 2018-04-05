@@ -1,8 +1,7 @@
 
 import logging
 
-from .				import isolate
-from .				import Populater
+from populater			import ( Populater, isolate )
 
 log				= logging.getLogger("tests")
 log.setLevel( logging.DEBUG )

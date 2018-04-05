@@ -1,6 +1,6 @@
 
 #
-# Populater -- Route path based requests to JSON endpoints.  Designed for web APIs
+# Populater -- Cross platform string syntax for reliably extracting object data
 #
 # Copyright (c) 2018, Web Heroes Inc.
 #
@@ -33,5 +33,5 @@ logging.basicConfig(
     format			= '%(asctime)s.%(msecs).03d [ %(threadName)10.10s ] %(name)-15.15s : %(funcName)-15.15s %(levelname)-8.8s %(message)s',
 )
 
-import isolate
-from populater			import Populater
+from .				import isolate
+from .populater			import Populater

@@ -2,7 +2,7 @@
 import logging
 
 log				= logging.getLogger("isolate")
-log.setLevel( logging.DEBUG )
+# log.setLevel( logging.DEBUG )
 
 def method(name=None, fn=None, err=None):
     if fn is None:

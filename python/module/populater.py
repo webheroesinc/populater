@@ -1,7 +1,12 @@
 
+import logging
 import re
 
-import isolate
+from .				import isolate
+
+log				= logging.getLogger('Populater')
+# log.setLevel(logging.DEBUG)
+
 
 class Template( object ):
 
