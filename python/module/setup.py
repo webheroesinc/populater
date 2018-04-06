@@ -9,7 +9,7 @@ setup(
         "populater":		".",
     },
     install_requires            = [],
-    version                     = "0.1.2",
+    version                     = "0.1.5",
     include_package_data        = True,
     author                      = "Matthew Brisebois",
     author_email                = "matthew@webheroes.ca",
@@ -17,7 +17,9 @@ setup(
     license                     = "Dual License; GPLv3 and Proprietary",
     description                 = "Cross platform string syntax for reliably extracting object data",
     long_description            = """
+
 Cross platform string syntax for reliably extracting object data
+
 
 ===============
  Usage examples
