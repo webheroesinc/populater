@@ -1,3 +1,4 @@
+// pluck, yank, extract, pick, harvest, select, isolate, access, collect, procure, retrieve
 var isolate		= require('./isolate.js');
 
 function startsWith(s, n) {

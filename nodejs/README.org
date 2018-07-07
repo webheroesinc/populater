@@ -1,5 +1,24 @@
 
 * Usage
+  
+
+  #+BEGIN_SRC javascript
+  var cxt		= populater({
+      key: "Value!"
+  });
+  ctx( "{{key}}" )		// "Value!"
+  ctx( "= this.key" )		// "Value!"
+  ctx( "< key" )		// "Value!"
+  ctx( ":= {{key}}" )		// "= Value!"
+  ctx( ":< {{key}}" )		// "< Value!"
+
+  var context		= populater(data);
+  context("Hello {{text}}!")	// === "Hello World!";
+
+  var template		= populater.template("Hello {{text}}!");
+  template.context(data)	// === "Hello World!";
+
+  #+END_SRC
    
 ** Basic
 

@@ -146,3 +146,16 @@ try {
     else
 	console.log("Failed: To catch non-string error");
 }
+
+echo = function () {
+    var msg		= Array.prototype.slice.call(arguments).join(' ');
+    console.log( msg );
+    return msg;
+};
+person = {
+    first: "Matthew",
+    last: "Brisebois",
+};
+
+console.log( isolate.extract('= echo( person.first, person.last, person )', global) );
+

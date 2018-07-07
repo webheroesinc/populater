@@ -36,4 +36,30 @@ module.exports = {
 	    return null;
 	}
     },
+    extract: function() {
+	// eval(code, <object> context)
+	try {
+	    eval.data	= arguments[1];
+	    if (typeof arguments[1] !== 'object')
+		throw TypeError("Argument 2 must be an object");
+	    return (function () {
+		console.log([
+		    'function ('+Object.keys(this).join(', ') + ') {',
+    		    '    '+ ( arguments[0].startsWith('=') ? 'return '+arguments[0].slice(1) : arguments[0] ),
+		    '})(' + Object.keys(this).map(k => 'this.'+k).join(', ') +')'
+		].join("\n"));
+		
+		return eval([
+		    '(function ('+Object.keys(this).join(', ') + ') {',
+    		    '    '+arguments[0].startsWith('=') ? 'return '+arguments[0].slice(1) : arguments[0],
+		    '})(' + Object.keys(this).map(k => 'this.'+k).join(', ') +')'
+		].join("\n"));
+	    }).call(arguments[1], arguments[0].trim());
+	}
+	catch (e) {
+	    if (typeof eval.error === 'function')
+		eval.error(e);
+	    return null;
+	}
+    },
 };
