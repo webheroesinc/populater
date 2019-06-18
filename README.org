@@ -1,0 +1,143 @@
+#+SETUPFILE: https://mjbrisebois.github.io/org-html-themes/setup/theme-readtheorg.setup
+
+#+TITLE: Populater
+#+SUBTITLE: Cross platform syntax for extracting and injecting object data
+#+DESCRIPTION: Cross platform syntax for extracting and injecting object data
+
+#+AUTHOR: Matthew Brisebois
+#+EMAIL: matthew@webheroes.ca
+
+* Syntax
+
+  #+begin_src javascript
+  const ctx		= Populater({ name: "Bob Dylan", age: 48, sex: "m" })
+  #+end_src
+
+  *Populater*
+   - destructuring commands extract data from a JSON based structure
+   - structuring commands inject data into a JSON based structure
+
+  Templating
+
+  #+begin_src javascript
+  // Valid path references
+  ctx("{{ name }}")         == "{{ this.name }}"      => "Bob Dylan"
+  ctx("{{ @name }}")        == "{{ this.name }}"      => "Bob Dylan"
+  ctx("{{ @['name'] }}")    == "{{ this.name }}"      => "Bob Dylan"
+  // Also valid, though ugly
+  ctx("{{ ['name'] }}")     == "{{ this.name }}"      => "Bob Dylan"
+  ctx("{{ @.name }}")       == "{{ this.name }}"      => "Bob Dylan"
+  // Type casting
+  ctx("{{ age:string }}")   == "48"
+  // Strict type checking
+  ctx("{{ age:!string }}")  == undefined
+  // Get language specific reference
+  ctx("{{ &name }}")        == "{{ this.name:ref }}"  => JS eg.       "this.name"
+  ctx("{{ &name }}")        == "{{ this.name:ref }}"  => PHP eg.      "$this['name']"
+  ctx("{{ &name }}")        == "{{ this.name:ref }}"  => Python eg.   "self['name']"
+  ctx("= len({{ &name }})") == "= len(self.name)"     => Python eg.   9
+  // Copying (need use case)
+  ctx("{{ @ }}")            == "{{ this }}"           => { ... } copy of original data
+  ctx("{{ @* }}")           == "{{ this* }}"          => { ... } points to original data
+  #+end_src
+
+  Reference
+  : ctx("@name")
+  : ctx("@name:string")
+  : ctx("@name:string")
+
+  Eval statement
+  : ctx("= this.name")
+  : ctx("= @name")
+
+  Methods as filters
+  : ctx("{{ name | json }}")
+  Calling methods via eval
+  : ctx("= json( this.name )")
+
+** Command Symbols
+
+   | Name        | Symbol  | Effect                        |
+   |-------------+---------+-------------------------------|
+   | Pick        | ~@~     |                               |
+   | Assign      | ~=~     |                               |
+   | Type        | ~:~     |                               |
+   | Format flag | ~!~     | Disable formatting            |
+   | Alternative | ~[]~    | Reserved for language support |
+   |             | ~()~    |                               |
+   |             | ~<~     |                               |
+   |             | ~>~     |                               |
+   |             | ~-~     |                               |
+   |             | ~_~     |                               |
+   |             | ~$~     |                               |
+   |             | ~{{}}~  |                               |
+   |             | \vert   |                               |
+
+*** Escaping
+    A backslash prefix will prevent any characters from being interpreted as commands
+    : ctx("\= this.name")               // "= this.name"
+    : ctx("\@name")                     // "@name"
+    : ctx("\\@name")                    // "\@name"
+
+    A backslash will not disbale templating
+    : ctx("\{{ name }}")                // "Bob Dylan"
+  
+    A bang symbol will disable templating (must be before any character command)
+    : ctx("!{{ name }}")                // "{{ name }}"
+    : ctx("\! {{ name }}")              // "! Bob Dylan"
+    : ctx("!\ {{ name }}")              // " {{ name }}"
+    : ctx("!\= {{ name }}")             // "= {{ name }}"
+    : ctx("!\\ {{ name }}")             // "\ {{ name }}"
+
+    : ctx("!= String( '{{ name }}' )")  // "{{ name }}"
+    : ctx("!@{{ age }}")                // undefined
+    : ctx("!@{{ age }}")                // "this.{{ age }}"
+
+** Structuring commands
+
+   : ctx                = Populater( {} )
+
+   Assignment
+   #+begin_src javascript
+   ctx("name.full",        "Bob Dylan")
+   ctx("name.full:string", "Bob Dylan")
+   ctx("@name.full",       "Bob Dylan")
+   // Single argument method
+   ctx("@name.full       = 'Bob Dylan'")
+   #+end_src
+
+** Methods
+
+   #+begin_src javascript
+   Populater.method("isAdult", function ( age ) {
+       return age >= 18;
+   });
+
+   // Cross plateform reference usage
+   ctx("= isAdult( {{ &age }} )")      == true
+   // Language specific usage
+   ctx("= !isAdult( this.age )")       == false
+   #+end_src
+
+*** Method grouping with structuring commands
+    #+begin_src javascript
+    Populater.method("is.adult", function ( age ) {
+        return age >= 18;
+    });
+    // Cross plateform reference usage
+    ctx("= is.adult( {{ &age }} )")     == true
+    #+end_src
+
+* Possible commands
+
+  : ctx("$ name")
+  : ctx("# name")
+  : ctx("& name")
+  : ctx("[] name")
+  : ctx("() name")
+  : ctx("<> name")
+  : ctx("- name")
+  : ctx("~ name")
+  : ctx("_ name")
+  : ctx("// name")
+
